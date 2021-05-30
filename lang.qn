@@ -1,0 +1,110 @@
+// how @use can work - enabling the module to be
+// just a function
+default = (file: String) {
+    #scope.include(#program.pwd + file)
+}
+
+// ---------------- JSON.from overloading ----------
+// pattern matching
+from(url: String, method: String = "GET") {}
+
+from(file: String) {}
+
+from(contents: String) {}
+
+// =============================================
+
+split(_: String) {}
+
+join(_: Array) :: String {
+    for p in _ {
+
+    }
+}
+
+<RunOut> = { code: Int, out: String, err: String }
+
+run(_: TickString) :: <RunOut> {}
+
+run(all: Array<TickString>) :: Array<RunOut> {}
+
+map(fn: (Any) :: Any) {}
+
+// -----------------------------------
+
+<User> {
+    name: String,
+    age: Int,
+    is_onboarded: Bool
+}
+
+const = use "constants.qn"
+
+mypath = path.join [path.here, "./app.zip"]
+
+c = echo $PATH
+
+// panics and exists on status > 0
+users = json.from { url: "http://localhost:3000/api" } |e|  {
+    echo f"config parsing failed with error {e}" ::
+} 
+
+for i in 0..10 {}
+
+for i in 0..users.len {
+    u = users[i]
+}
+
+for i, u in ..users {}
+
+for u in users {}
+
+services = yaml.from { file: "conf.yaml" }!!
+for _, s in services.list {
+    run `docker run -n s.name -t s.tag -s s.bridge`
+    run { all: [`echo "hey"`, `ls -al`] }
+}
+
+if! mypath.exists {
+    echo f"Done with {mypath} execution"
+}
+
+hello(name) :: f"Hello, {name}"
+add(a, b) :: a + b 
+some_fn(a, b, third) [add, c] {
+    get_base_name = (c) :: c.sub { start: c.lasti "/" + 1, end: c.len}
+    c = c.split ":" // error c is a number and does not have split function
+    c = c.map { fn: get_base_name } // now has list of all commands in path
+    added = add(a, b)
+    :: { result: added * third, name: "Ashish" }
+}
+
+// SCOPE
+user: <User> = {
+    name: "ashish",
+    age: 21,
+    summary: () [self] :: f"User: {self.name} of {self.age}"
+}
+
+
+body, status = http.get { url: f"http://localhost/api/{user.name}" } |e| {
+    echo f"error: {e} occured" ::
+} 
+if Bool.and [status is http.OK, body is! Buffer.EMPTY] {
+    // do something
+}
+// Alternative
+if status is http.OK and body is! Buffer.EMPTY {
+    // do something
+}
+
+some_body = json.from { buf: body }
+
+
+flag_fn(val) { // do something with val
+}
+compile_fn(val) { // do something with val
+}
+
+flag.register { short: "f", long: "flag", fn: flag_fn }
+flag.register { short: "c", long: "compile", fn: compile_fn }

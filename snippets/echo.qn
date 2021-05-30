@@ -1,0 +1,4 @@
+# this is a comment
+name = "Ashish"
+echo "Hello, World"
+echo f"Hello, {name}"
